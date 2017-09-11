@@ -15,42 +15,41 @@ var factorial = function(n) {
   }
   return n * factorial(n-1);
 };
+
 // 2. Compute the sum of an array of integers.
 // sum([1,2,3,4,5,6]); // 21
-
-
 var sum = function(array) {
   //BASE CASE
   if (array.length === 0) return 0;
-  if (array.length === 1) {
+  else if (array.length === 1) {
     return array[0];
-  }
-  // otherwise, add array at 0 and 1, recurse with reduced array
-  else {
-    return array.shift() + sum(array);
-  }
+  } else {  // add first position to results of recursive call on shortened array     
+    var firstNumber = array[0];
+    var shortenedArray = array.slice(1);
+    // console.log(shortenedArray);
+    return firstNumber + sum(shortenedArray);
+  };
 };
-
-// console.log(sum([1,2,3,4,5,6])); // 21
+// console.log(sum([1,2,3,4,5,5,6,9])); // 21
 
 // 3. Sum all numbers in an array containing nested arrays.
 // arraySum([1,[2,3],[[4]],5]); // 15
 var arraySum = function(array) {
-  // BASE CASE
-  if (array.length === 0) {
-    return 0;
-  } else {
-    for (item in array) {
-      if (Array.isArray(array[item])) {
-        // console.log ('i am an array!', array[item]);
-        arraySum(array[item]);
-      } else {
-        // console.log ('i am a number!', array[item]);
+  var arraySumTotal = 0;
+  checkAndAdd = function(array) {
+    for (var item in array) {
+      // check item in array
+      if (typeof array[item] === 'number') { // if it is a number ...
+        arraySumTotal += array[item]; // add to total
+      } else if (Array.isArray(array[item])){ // if it is an array ...
+        checkAndAdd(array[item]); // run arraySum on the sub-array
       }
     }
   }
-};
-
+  // return total
+  checkAndAdd(array);
+  return arraySumTotal;
+};  
 // console.log(arraySum([[1],[2,3],[[4]],5]));
 
 // 4. Check if a number is even.
@@ -62,7 +61,6 @@ var isEven = function(n) {
   // if neither zero nor one have been reached, subtract 2 from |n|
   return isEven(Math.abs(n) - 2);
 };
-
 
 // 5. Sum all integers below a given integer.
 // sumBelow(10); // 45
@@ -87,39 +85,30 @@ var sumBelow = function(n) {
   // }
   //  return sum;
  };
-console.log(sumBelow(-6));
+// console.log(sumBelow(-6));
 
 // 6. Get the integers within a range (x, y).
 // range(2,9); // [3,4,5,6,7,8]
+var rangeArray = [];
 var range = function(x, y) {
-  // create empty array with x+1 as first item
-  var array = [];
   
-  if (x < y) {
-    // length of final array will equal y-x-1
-    var targetLength = y-x-1;
-    // continue increasing x by one and pushing onto array
-    for (var i = 0; i < targetLength; i++) {
-      x = x + 1;
-      array.push(x);
-      // console.log(array);
-    }
-  } // end x < y
+  var multiplier = 1;
+  if (x === y || x - y === Math.abs(1)) {return [];}
+  rangeArray.push(x+1);
+  console.log(rangeArray);
 
-  if (x > y) {
-    // length of final array will equal x-y-1
-    targetLength = x-y-1;
-    // continue decreasing x by one and pushing onto array
-    for (var i = 0; i < targetLength; i++) {
-      x = x - 1;
-      array.push(x);
-      // console.log(array);
-    }
-  } // end x > y
-  return array;
+  if (x < 1 && y < 1) {
+    multiplier = -1;
+  }
+  
+  if (x+1 !== (y-1)) {
+    return range(x+1, y);
+  }
+  var returnArray = rangeArray;
+  rangeArray = [];
+  return returnArray;
 };
-
-// console.log(range(12,4)); // [3,4,5,6,7,8]
+// console.log(range(-9,-4));
 
 
 // 7. Compute the exponent of a number.
@@ -129,14 +118,17 @@ var range = function(x, y) {
 // https://www.khanacademy.org/computing/computer-science/algorithms/recursive-algorithms/a/computing-powers-of-a-number
 var exponent = function(base, exp) {
   //BASE CASE: n=0 / 1
-  if (exp < 1) {
+  if (exp < 0) {
+    return exponent(base, exp+1)/base    
+  }
+  else if (exp === 0) {
     return 1;
   } else {
    return base * exponent(base, exp-1);
   }
 };
 
-// console.log(exponent(5, 5));
+// console.log(exponent(4, -3));
 
 // 8. Determine if a number is a power of two.
 // powerOfTwo(1); // true
@@ -144,20 +136,16 @@ var exponent = function(base, exp) {
 // powerOfTwo(10); // false
 var powerOfTwo = function(n) {
   //BASE CASES: < 0, return false / === 1 return true
-  var powerArray = [];
-  if (n < 0) { return false };
+  if (n <= 0) { return false };
   if (n === 1 || n === 2) { return true };
   // OR: if % 2 does not equal zero, then return false
   if (n % 2 !== 0) {
     return false;
-    // ELSE: loop through 2*x from 2 to 20 to create an array
-    // check if n is in array
-      // if yes, return true
-      // if no, return false
-  } else {
-    return false;
-    }
+  }
+  return powerOfTwo(n/2);
 };
+
+// console.log(powerOfTwo(1), powerOfTwo(16), powerOfTwo(10));
 
 // 9. Write a function that reverses a string.
 var reverse = function(string) {
@@ -188,15 +176,30 @@ var palindrome = function(string) {
   return true;
 };
 
-palindrome('will you be here tomorrow');
+// console.log(palindrome('will you be here tomorrow'));
+// console.log(palindrome('dj w ejib uubij ewj d'))
 
 // 11. Write a function that returns the remainder of x divided by y without using the
 // modulo (%) operator.
 // modulo(5,2) // 1
 // modulo(17,5) // 2
 // modulo(22,6) // 4
+
 var modulo = function(x, y) {
+  if (y === 0) {
+    return NaN;
+  } else if (y === 1 || x === 0) {
+    return 0;
+  } 
+  if (x < y) {
+    return x;
+  } else {
+    return modulo (x-y, y);
+  }
 };
+
+console.log(modulo(2,1));
+// , modulo(17,5), modulo(22,6));
 
 // 12. Write a function that multiplies two numbers without using the * operator or
 // Math methods.
